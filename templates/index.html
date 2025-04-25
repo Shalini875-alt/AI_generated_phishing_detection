@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Email Phishing Detector</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #e3f2fd, #fce4ec);
+            margin: 0; padding: 40px;
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        form {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 700px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 15px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            resize: vertical;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 12px 25px;
+            background: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #1976D2;
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 12px;
+            animation: fadeIn 0.6s ease-in;
+        }
+
+        .safe {
+            background-color: #d0f0c0;
+            color: #155724;
+        }
+
+        .phishing {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .ai-generated {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .detail {
+            margin-top: 10px;
+            font-size: 14px;
+            background: #f1f1f1;
+            padding: 8px;
+            border-left: 4px solid #2196F3;
+            border-radius: 5px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <h1><i class="fas fa-shield-alt"></i> Email Phishing Detector</h1>
+
+    <form method="POST">
+        <label for="email"><strong>Paste Email Content Below:</strong></label>
+        <textarea name="email" id="email" required>{{ email_text }}</textarea>
+        <button type="submit"><i class="fas fa-search"></i> Analyze Email</button>
+    </form>
+
+    {% if prediction %}
+    <div class="result 
+        {% if 'ai_generated_phishing' in prediction %}phishing ai-generated
+        {% elif 'human_written_phishing' in prediction %}phishing
+        {% elif 'ai_generated_safe' in prediction %}ai-generated
+        {% else %}safe{% endif %}">
+        <h3>🔍 Result: <em>{{ prediction.split(':')[0] }}</em></h3>
+        <p>{{ prediction.split(':')[1] if ':' in prediction else prediction }}</p>
+
+        {% if "http" in email_text %}
+        <div class="detail">
+            🔗 <strong>Contains Links:</strong> This email contains hyperlinks that may be suspicious.
+        </div>
+        {% endif %}
+
+        {% if "password" in email_text or "login" in email_text or "verify" in email_text %}
+        <div class="detail">
+            🔐 <strong>Security Keywords Detected:</strong> Contains terms like "password", "login", or "verify".
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+</body>
+</html>
